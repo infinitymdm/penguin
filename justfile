@@ -26,7 +26,7 @@ clean:
     rm -rf {{build_dir}}
     rm -rf {{sim_dir}}
 
-# Check the design for common code errors
+# Check a design for common code errors
 lint design *VERILATOR_FLAGS:
     verilator --lint-only --timing -Wall {{VERILATOR_FLAGS}} {{include_dirs}} {{src_sv}} --top {{design}} `find -name {{design}}.sv`
 
@@ -38,27 +38,27 @@ preprocess design *SV2V_FLAGS: _prep
 ## Simulation Recipes
 
 # Verilate a testbench
-verilate design *VERILATOR_FLAGS: _prep
+verilate testbench *VERILATOR_FLAGS: _prep
     verilator --binary --timing --trace -Wno-lint \
         -MAKEFLAGS "--silent" \
         --Mdir {{build_dir}} \
         {{VERILATOR_FLAGS}} \
         -j `nproc` \
         {{include_dirs}} \
-        --top {{design}} \
-        `find -name {{design}}.sv`
-    make --silent -C {{build_dir}} -f V{{design}}.mk V{{design}}
-    just run {{design}}
+        --top {{testbench}} \
+        `find -name {{testbench}}.sv`
+    make --silent -C {{build_dir}} -f V{{testbench}}.mk V{{testbench}}
+    @just run {{testbench}}
 
 # Run simulation on a previously verilated testbench
-run design *FLAGS:
-    cp {{build_dir}}/V{{design}} {{sim_dir}}/.
-    cd {{sim_dir}} && ./V{{design}} {{FLAGS}}
+run testbench *FLAGS:
+    cp {{build_dir}}/V{{testbench}} {{sim_dir}}/.
+    cd {{sim_dir}} && ./V{{testbench}} {{FLAGS}}
 
 # Simulate a testbench using QuestaSim
-questasim design *QUESTA_FLAGS: (preprocess design)
-    vlog -lint -work {{sim_dir}}/work {{QUESTA_FLAGS}} {{src_sv}} `find -name {{design}}.sv`
-    cd {{sim_dir}} && vsim -c {{design}} -do "run -all"
+questasim testbench *QUESTA_FLAGS: (preprocess testbench)
+    vlog -lint -work {{sim_dir}}/work {{QUESTA_FLAGS}} {{src_sv}} `find -name {{testbench}}.sv`
+    cd {{sim_dir}} && vsim -c {{testbench}} -do "run -all"
 
 # View simulation waveforms
 view:
