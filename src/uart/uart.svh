@@ -1,6 +1,6 @@
-struct {
-    bit     start;
-    byte    data; // Assume 8 bit data frame, no parity (we can change this later)
-    bit     stop;
-} uart_packet;
-
+typedef enum logic [1:0] {
+    IDLE = 0,
+    START,
+    DATA,
+    STOP
+} uart_state;
