@@ -12,10 +12,10 @@ testbench checks its answers against `openssl`. You'll want to make sure you hav
 (in addition to the usual prerequisites mentioned in
 [the README](https://github.com/infinitymdm/penguin/tree/main?tab=readme-ov-file)).
 
-Run the testbench like so:
+Run the OpenSSL testbench like so:
 
 ```bash
-just verilate tb_sha3 -DDIGEST_LENGTH=512 -DSTAGES=6 -DMESSAGE_FILE=tb/sha3_test.bin
+just verilate tb_sha3_openssl -DDIGEST_LENGTH=512 -DSTAGES=6 -DMESSAGE_FILE=README.md
 ```
 
 Feel free to use different values for the three `define`s. Valid values are:

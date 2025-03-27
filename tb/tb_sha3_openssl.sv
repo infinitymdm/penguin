@@ -11,7 +11,7 @@
     `error_define_MESSAGE_FILE_must_be_set
 `endif
 
-module tb_sha3;
+module tb_sha3_openssl;
 
     localparam d = `DIGEST_LENGTH;  // 512, 384, 256, 224 all work
     localparam s = `STAGES;         // All integer divisors of 24 work
