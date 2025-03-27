@@ -2,10 +2,10 @@ module keccak #(
     parameter d = 512,      // digest length in bits
     parameter l = 6,        // log base 2 of the lane size. Use l=6 for all SHA3/SHAKE ops.
     parameter s = 6,        // number of stages (i.e. number of cycles for one sponge operation)
-    parameter w = 2**l,     // lane size (i.e. word length)
-    parameter b = 25*w,     // keccak permutation width (i.e. state vector length)
-    parameter c = 2*d,      // capacity of the sponge function
-    parameter r = b - c,    // rate of the sponge function
+    parameter w = 2**l,     // lane size (i.e. word length) in bits
+    parameter b = 25*w,     // keccak permutation width (i.e. state vector length) in bits
+    parameter c = 2*d,      // capacity of the sponge function in bits
+    parameter r = b - c,    // rate of the sponge function in bits
     parameter n = 12 + 2*l, // total number of rounds
     parameter q = n / s     // number of rounds per stage
 ) (
@@ -16,41 +16,43 @@ module keccak #(
     output logic [d-1:0] digest
 );
 
-    // keccak encapsulates the necessary hardware required to implement the keccak[c] function as
-    // described in FIPS202 section 5.2.
+    // keccak encapsulates the necessary hardware required to implement the keccak function as
+    // described in FIPS202 section 5.
 
-    // TODO: implement the below
-    // - SHA3 and SHAKE suffixes
-    // - padding function
-    // - iota_const generation
+    // TODO
+    // - investigate variable capacity/rate (i.e. to allow <512 bit digests on SHA3-512 hardware)
+    //     - Bus widths would need to be max(d) and max(r) = 1600 - 2*min(d) bits
+    //     - This would require parameters for max(d) and min(d)
 
     // Note: These work for all SHA3/SHAKE algorithms (i.e., where l=6).
     // See FIPS202 section 3.2.5 for details on how to generate constants for l!=6.
-    logic [23:0][63:0] iota_consts = {
-        64'h8000000080008008,
-        64'h0000000080000001,
-        64'h8000000000008080,
-        64'h8000000080008081,
-        64'h800000008000000a,
-        64'h000000000000800a,
-        64'h8000000000000080,
-        64'h8000000000008002,
-        64'h8000000000008003,
-        64'h8000000000008089,
-        64'h800000000000008b,
-        64'h000000008000808b,
-        64'h000000008000000a,
-        64'h0000000080008009,
-        64'h0000000000000088,
-        64'h000000000000008a,
-        64'h8000000000008009,
-        64'h8000000080008081,
-        64'h0000000080000001,
-        64'h000000000000808b,
-        64'h8000000080008000,
-        64'h800000000000808a,
-        64'h0000000000008082,
-        64'h0000000000000001
+    // These are equivalent to the constants in FIPS202, but minimized per the procedure
+    // in https://link.springer.com/article/10.1007/s13389-023-00334-0
+    logic [23:0][6:0] iota_consts = {
+        7'b0010111,
+        7'b1000010,
+        7'b0001101,
+        7'b1001111,
+        7'b0110011,
+        7'b0110100,
+        7'b0001001,
+        7'b0100101,
+        7'b1100101,
+        7'b1011101,
+        7'b1111001,
+        7'b1111110,
+        7'b0110010,
+        7'b1010110,
+        7'b0011000,
+        7'b0111000,
+        7'b1010101,
+        7'b1001111,
+        7'b1000010,
+        7'b1111100,
+        7'b0000111,
+        7'b0111101,
+        7'b0101100,
+        7'b1000000
     };
 
     // Count stages. This controls whether we xor with the message chunk and which round constants

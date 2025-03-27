@@ -4,7 +4,7 @@ module keccak_round #(
     parameter b = 25*w
 ) (
     input  logic [b-1:0] x,
-    input  logic [w-1:0] rc,
+    input  logic   [l:0] rc,
     output logic [b-1:0] y
 );
 
@@ -27,6 +27,6 @@ module keccak_round #(
     // Perform a single round of the keccak-p permutation
     keccak_theta_rho_pi #(w) thrhp (.x(x_block), .y(x_pi));
     keccak_chi          #(w) chi   (.x(x_pi),    .y(x_chi));
-    keccak_iota         #(w) iota  (.x(x_chi),   .y(y_block), .rc);
+    keccak_iota         #(l) iota  (.x(x_chi),   .y(y_block), .rc);
 
 endmodule

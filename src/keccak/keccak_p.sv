@@ -8,7 +8,7 @@ module keccak_p #(
     input  logic enable,
     input  logic reset,
     input  logic [b-1:0] x,
-    input  logic [n-1:0][w-1:0] rc,
+    input  logic [n-1:0][l:0] rc,
     output logic [b-1:0] y
 );
 
