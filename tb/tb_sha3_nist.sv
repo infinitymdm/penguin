@@ -101,7 +101,7 @@ module tb_sha3_nist;
             no_more_chunks = 1;
             // convert one byte at a time until out of bytes
             for (int i = 0; 8*i < remaining_len; i++) begin: read_partial_slice_bytes
-                message_byte = message_full.substr(2*i, 2*i+1).atohex();
+                message_byte = message_full.substr(2*(i+r*index/8), 2*(i+r*index/8) + 1).atohex();
                 message_chunk = {message_chunk[r-9:0], message_byte};
             end
             // pad according to SHA-3 pad10*1 rule
@@ -117,7 +117,7 @@ module tb_sha3_nist;
             no_more_chunks = 0;
             // convert one byte at a time until slice is full
             for (int i = 0; 8*i < r; i++) begin: read_full_slice_bytes
-                message_byte = message_full.substr(2*i, 2*i+1).atohex();
+                message_byte = message_full.substr(2*(i+r*index/8), 2*(i+r*index/8) + 1).atohex();
                 message_chunk = {message_chunk[r-9:0], message_byte};
             end
         end
@@ -153,6 +153,7 @@ module tb_sha3_nist;
                 #1;
                 reset = 0;
                 read_test_vector(rsp_file, eof, len, message_full, expected_digest);
+                // $display("Msg = %s", message_full);
                 no_more_chunks = 0; // Force next cycle to fetch a new chunk
                 chunk_index = 0;
 
@@ -165,6 +166,7 @@ module tb_sha3_nist;
             end else begin: get_next_chunk
                 // Load the next chunk of the message (with padding applied as appropriate)
                 get_message_chunk(len, chunk_index, message_full, message_chunk, no_more_chunks);
+                // $display("chunk: %h", message_chunk);
                 chunk_index++;
                 enable = 1;
             end
