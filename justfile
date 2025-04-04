@@ -56,8 +56,8 @@ run testbench *FLAGS:
     cd {{sim_dir}} && ./V{{testbench}} {{FLAGS}}
 
 # Simulate a testbench using QuestaSim
-questasim testbench *QUESTA_FLAGS: (preprocess testbench)
-    vlog -lint -work {{sim_dir}}/work {{QUESTA_FLAGS}} {{src_sv}} `find -name {{testbench}}.sv`
+questasim testbench *QUESTA_FLAGS: _prep
+    vlog -lint -work {{sim_dir}}/work {{QUESTA_FLAGS}} {{src_sv}} tb/{{testbench}}.sv
     cd {{sim_dir}} && vsim -c {{testbench}} -do "run -all"
 
 # View simulation waveforms

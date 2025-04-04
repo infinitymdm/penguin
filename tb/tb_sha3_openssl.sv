@@ -95,6 +95,9 @@ module tb_sha3_openssl;
             waited_cycles++;
         end else begin: handle_eof
             #((s-1)*10);
+            `ifdef MODEL_TECH
+                #10; // If using modelsim, we need 1 more cycle of delay for some reason
+            `endif
             enable = 1'b0;
             #1;
             $display("digest:  %h", digest);
