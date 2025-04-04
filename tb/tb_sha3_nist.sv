@@ -135,6 +135,9 @@ module tb_sha3_nist;
                 // Check results if the dut was previously enabled
                 if (enable) begin: check_result
                     $display("nist:   %h", expected_digest);
+                    `ifdef MODEL_TECH
+                        #10; // Questa needs an extra delay for some reason
+                    `endif
                     $display("digest: %h", digest);
                     if (digest == expected_digest) begin: result_pass
                         $write("%c[1;32m", 27); // Set style bold, green foreground
@@ -144,6 +147,7 @@ module tb_sha3_nist;
                         $write("%c[1;30m", 27); // Set style bold, red foreground
                         $display("FAIL");
                         $error("Failed on message %s with %d bits!", message_full, len);
+                        $finish;
                     end
                 end
 
