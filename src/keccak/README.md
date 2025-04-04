@@ -15,7 +15,7 @@ testbench checks its answers against `openssl`. You'll want to make sure you hav
 Run the OpenSSL testbench like so:
 
 ```bash
-just verilate tb_sha3_openssl -DDIGEST_LENGTH=512 -DSTAGES=6 -DMESSAGE_FILE=README.md
+just verilate tb_sha3_openssl +define+DIGEST_LENGTH=512+STAGES=6+MESSAGE_FILE=README.md
 ```
 
 Feel free to use different values for the three `define`s. Valid values are:
@@ -29,8 +29,21 @@ it. Hopefully those are pretty self-explanatory.
 You can also simulate against the NIST byte-oriented test vectors by running
 
 ```bash
-just verilate tb_sha3_nist -DDIGEST_LENGTH=512 -DSTAGES=6 -DMESSAGE_FILE=tb/SHA3_512LongMsg.rsp
+just verilate tb_sha3_nist +define+DIGEST_LENGTH=512+STAGES=6+MESSAGE_FILE=tb/SHA3_512LongMsg.rsp
 ```
 
 Only the 512-bit .rsp files are included, but the rest can be obtained from NIST
 [here](https://csrc.nist.gov/Projects/Cryptographic-Algorithm-Validation-Program/Secure-Hashing).
+
+Last but not least, if you want to use Questa/ModelSim instead of verilator, just swap to the
+`questasim` recipe. You can even use the same format for the defines, and this works with either
+testbench.
+
+```bash
+just questasim tb_sha3_nist +define+DIGEST_LENGTH=512+STAGES=6+MESSAGE_FILE=tb/SHA3_512LongMsg.rsp
+```
+
+That said, Verilator massively outperforms Questa/ModelSim here. In my testing, Questa 2024.3 took
+about 14 minutes to run through the NIST long messages, while Verilator was done compiling and
+simulating in under 10 seconds. Given the performance difference, I highly recommend using the
+Verilator flows!
