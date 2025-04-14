@@ -62,4 +62,4 @@ questasim testbench *QUESTA_FLAGS: _prep
 
 # View simulation waveforms
 view:
-    gtkwave {{sim_dir}}/*.vcd
+    surfer {{sim_dir}}/*.vcd

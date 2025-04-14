@@ -14,7 +14,7 @@ You'll need a few pieces of software to make use of the flows in this repository
 - [verilator](https://github.com/verilator/verilator) for simulation
 - [sv2v](https://github.com/zachjs/sv2v) for SystemVerilog to Verilog conversion
 - [just](https://github.com/casey/just) for running flows (see the justfile)
-- [gtkwave](https://github.com/gtkwave/gtkwave) (optional) if you want to view waveforms using `just view`
+- [surfer](https://surfer-project.org) (optional) if you want to view waveforms using `just view`
 
 ### Get the code
 
