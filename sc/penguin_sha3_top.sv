@@ -5,5 +5,5 @@ module penguin_sha3_top (
     input  logic [575:0] message,
     output logic [511:0] digest
 );
-    keccak #(.d(512), .l(6), .s(6)) sha3_512_6stage (.*);
+    keccak #(.d(512), .l(6), .s(24)) sha3_512_24stage (.*);
 endmodule
