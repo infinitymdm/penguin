@@ -2,8 +2,10 @@
 
 module penguin_sha3_top (
     input  logic         clk, reset, enable,
+    input  logic   [1:0] op,
+    input  logic   [4:0] round,
     input  logic [575:0] message,
     output logic [511:0] digest
 );
-    keccak #(.d(512), .l(6), .s(24)) sha3_512_24stage (.*);
+    keccak_pipelined #(.D(512)) sha3_512_pipelined (.*);
 endmodule
