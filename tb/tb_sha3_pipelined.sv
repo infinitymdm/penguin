@@ -11,24 +11,26 @@
     `error_define_MESSAGE_FILE_must_be_set
 `endif
 
-module tb_sha3_openssl;
+module tb_sha3_pipelined;
 
     localparam d = `DIGEST_LENGTH;  // 512, 384, 256, 224 all work
-    localparam s = `STAGES;         // All integer divisors of 24 work
     string message_file_name = {"../", `TO_STRING(`MESSAGE_FILE)};
 
     // Derived
     localparam r = 1600 - 2*d;
 
     int message_file;
-    int waited_cycles;
+    int cycle_counter;
 
     bit clk, reset, enable;
+    bit   [1:0] op;
+    bit   [4:0] round;
     bit [r-1:0] message;
     bit [d-1:0] digest, expected_digest;
 
-    keccak_multicycle #(d, 6, s) dut (
+    keccak_pipelined #(d) dut (
         .clk, .reset, .enable,
+        .op, .round,
         .message, .digest
     );
 
@@ -38,13 +40,19 @@ module tb_sha3_openssl;
     end
 
     initial begin: init_and_reset
-        clk = 1'b0;
+        clk = 1'b1;
         enable = 1'b0;
         reset = 1'b1;
         message = '0;
-        waited_cycles = 0;
+        cycle_counter = 2;
+        round = 23;
+        #10;
+        enable = 1'b1;
+        #5;
+        reset = 1'b0;
     end
     always #5 clk <= ~clk;
+    assign op = cycle_counter % 3;
 
     initial begin: open_message_file
         message_file = $fopen(message_file_name, "rb");
@@ -87,14 +95,16 @@ module tb_sha3_openssl;
         end
     endtask
 
-    always @(posedge clk) begin: stimulate_dut
+    always @(posedge clk) begin: inc_cycles
+        cycle_counter++;
+        if ((op == 0)) round = (round < 23) ? round + 1 : 0;
+    end
+
+    always @(negedge clk) begin: stimulate_dut
         if (!$feof(message_file)) begin: get_message
-            reset = 1'b0;
-            enable = 1'b1;
-            if (waited_cycles % s == 0) read_message_chunk(message_file, message);
-            waited_cycles++;
+            if ((round == 23) && (op == 2)) read_message_chunk(message_file, message);
         end else begin: handle_eof
-            #((s-1)*10);
+            #720;
             `ifdef MODEL_TECH
                 #10; // If using modelsim, we need 1 more cycle of delay for some reason
             `endif

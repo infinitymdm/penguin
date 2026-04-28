@@ -1,4 +1,4 @@
-module keccak #(
+module keccak_multicycle #(
     parameter d = 512,      // digest length in bits
     parameter l = 6,        // log base 2 of the lane size. Use l=6 for all SHA3/SHAKE ops.
     parameter s = 6,        // number of stages (i.e. number of cycles for one sponge operation)

@@ -29,7 +29,7 @@ module tb_sha3_nist;
     bit [d-1:0] expected_digest, digest;
 
     bit clk, reset, enable;
-    keccak #(d, 6, s) dut (
+    keccak_multicycle #(d, 6, s) dut (
         .clk, .reset, .enable,
         .message(message_chunk), .digest
     );

@@ -4,7 +4,7 @@ build_dir       := 'build'
 sim_dir         := 'sim'
 
 # parse source files
-include_dirs    := `find {src,include} -name '*.sv*' -printf '-I%h\n' | sort -u | tr '\n' ' '`
+include_dirs    := `find src -name '*.sv*' -printf '-I%h\n' | sort -u | tr '\n' ' '`
 src_sv          := `find src -name "*.sv" | tr '\n' ' '`
 
 
