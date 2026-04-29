@@ -45,17 +45,16 @@ def syn(fileset: str = 'rtl', pdk: str = 'gf180'):
     project.set_design(PenguinSHA3Design())
     project.add_fileset(fileset)
     project.add_fileset(f'sdc.{pdk}')
-
     asic_target(project, pdk=pdk)
+
+    # Design constraints
+    project.set('constraint', 'area', 'diearea', (750,750))
+    project.set('constraint', 'area', 'density', 80)
 
     # Use slang for synthesis, since we're using systemverilog sources
     project.set('tool', 'yosys', 'task', 'syn_asic', 'var', 'use_slang', True)
 
-    # Try to optimize for area during synthesis
-    # project.set('tool', 'yosys', 'task', 'syn_asic', 'var', 'strategy', 'AREA1')
-
-    # Try to target high density during placement
-    project.set('tool', 'openroad', 'task', 'global_placement', 'var', 'place_density', 0.5)
+    # [print(k) for k in project.allkeys()]
 
     project.run()
     project.summary()
