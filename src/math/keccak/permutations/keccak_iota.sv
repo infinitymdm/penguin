@@ -15,16 +15,25 @@ module keccak_iota #(
                         // Note: The indices are a bit strange here because we're compensating for
                         // byte-endianness. If you reverse the order of the bytes, the indices
                         // match up with Sideris et. al.
-                        if (k == 63)        assign y[i][j][k] = x[i][j][k] ^ rc[3];
-                        else if (k == 59)   assign y[i][j][k] = x[i][j][k] ^ rc[4];
-                        else if (k == 57)   assign y[i][j][k] = x[i][j][k] ^ rc[5];
-                        else if (k == 56)   assign y[i][j][k] = x[i][j][k] ^ rc[6];
-                        else if (k == 55)   assign y[i][j][k] = x[i][j][k] ^ rc[2];
-                        else if (k == 39)   assign y[i][j][k] = x[i][j][k] ^ rc[1];
-                        else if (k == 7)    assign y[i][j][k] = x[i][j][k] ^ rc[0];
-                        else                assign y[i][j][k] = x[i][j][k];
+                        if (k == 63) begin: bit_63
+                            assign y[i][j][k] = x[i][j][k] ^ rc[3];
+                        end else if (k == 59) begin: bit_59
+                            assign y[i][j][k] = x[i][j][k] ^ rc[4];
+                        end else if (k == 57) begin: bit_57
+                            assign y[i][j][k] = x[i][j][k] ^ rc[5];
+                        end else if (k == 56) begin: bit_56
+                            assign y[i][j][k] = x[i][j][k] ^ rc[6];
+                        end else if (k == 55) begin: bit_55
+                            assign y[i][j][k] = x[i][j][k] ^ rc[2];
+                        end else if (k == 39) begin: bit_39
+                            assign y[i][j][k] = x[i][j][k] ^ rc[1];
+                        end else if (k == 7) begin: bit_7
+                            assign y[i][j][k] = x[i][j][k] ^ rc[0];
+                        end else begin: bit_passthrough
+                            assign y[i][j][k] = x[i][j][k];
+                        end
                     end
-                end else begin: passthrough
+                end else begin: passthrough_lanes
                     assign y[i][j] = x[i][j];
                 end
             end

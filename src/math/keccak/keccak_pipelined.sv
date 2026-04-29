@@ -7,7 +7,7 @@ module keccak_pipelined #(
     parameter R = B - C     // rate of the sponge function in bits
 ) (
     input  logic         clk, reset, enable,
-    input  logic   [1:0] op,
+    input  logic         op,
     input  logic   [4:0] round,
     input  logic [R-1:0] message,
     output logic [D-1:0] digest
@@ -43,17 +43,16 @@ module keccak_pipelined #(
 
     assign x = {q[B-1:C] ^ message, q[C-1:0]};
     vector2block #(W) v2b (.vector((round == 0) && (op == 0) ? x : q), .block(x_block));
+
+    // op 0: fused & optimized theta/rho/pi
     keccak_theta_rho_pi #(W) theta_rho_pi (.x(x_block), .y(y_pi));
+
+    // op 1: fused chi/iotoa
     keccak_chi          #(W) chi          (.x(x_block), .y(y_chi));
-    keccak_iota         #(L) iota         (.x(x_block), .y(y_iota), .rc(iota_consts[round]));
-    always_comb begin: op_select
-        case (op)
-            0:       y_block = y_pi;
-            1:       y_block = y_chi;
-            2:       y_block = y_iota;
-            default: y_block = 0;
-        endcase
-    end
+    keccak_iota         #(L) iota         (.x(y_chi), .y(y_iota), .rc(iota_consts[round]));
+
+    assign y_block = op ? y_iota : y_pi;
+
     block2vector #(W) b2v (.block(y_block), .vector(y));
     dffre #(.width(B)) iota_reg (.clk, .reset, .enable, .d(y), .q);
     assign digest = q[B-1-:D];
