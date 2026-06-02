@@ -1,3 +1,5 @@
+`timescale 1 ns / 1 ps
+
 module blackcell (
   input  logic [1:0] g_in, p_in,
   output logic g, p

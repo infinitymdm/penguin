@@ -1,3 +1,5 @@
+`timescale 1 ns / 1 ps
+
 module seven_seg_select_decoder (
   input logic [1:0] s,
   output logic [3:0] y

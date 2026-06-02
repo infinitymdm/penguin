@@ -1,3 +1,5 @@
+`timescale 1 ns / 1 ps
+
 module divide_by_1m (input logic clk,
                      output logic out_clk);
     logic [26:0] counter;

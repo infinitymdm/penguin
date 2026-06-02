@@ -1,3 +1,5 @@
+`timescale 1 ns / 1 ps
+
 module dec24_counter (
   input logic clk, dec, reset,
   output logic [3:0] ones, tens,
@@ -5,8 +7,8 @@ module dec24_counter (
 );
 
   // decimal_counter is a Moore FSM which counts up once each time
-  // clk is asserted. dec can be asserted to decrease by 1 
-  // synchronously, or reset can be asserted to set to 0 
+  // clk is asserted. dec can be asserted to decrease by 1
+  // synchronously, or reset can be asserted to set to 0
   // asynchronously.
   // Also provides a carry output for cascading with other counters.
 
@@ -73,7 +75,7 @@ module dec24_counter (
         ones = 3;
         tens = 0;
       end
-      S4: begin 
+      S4: begin
         ones = 4;
         tens = 0;
       end
@@ -114,7 +116,7 @@ module dec24_counter (
         ones = 3;
         tens = 1;
       end
-      S14: begin 
+      S14: begin
         ones = 4;
         tens = 1;
       end
@@ -163,5 +165,5 @@ module dec24_counter (
   end
 
   delay_ff d1(clk, (state == S23) & (nextstate == S0), carry);
-  
+
 endmodule

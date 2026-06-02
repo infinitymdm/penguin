@@ -1,5 +1,7 @@
+`timescale 1 ns / 1 ps
+
 module alu #(
-  parameter WORD_LEN /* verilator public */ = 32 
+  parameter WORD_LEN /* verilator public */ = 32
 ) (
   input logic [WORD_LEN-1:0] a, b,
   input logic [3:0] op_select,
@@ -25,7 +27,7 @@ module alu #(
       default: result = sum;
     endcase
 
-    //overflow = 
+    //overflow =
     zero = ~(|result);
   end
 

@@ -1,3 +1,5 @@
+`timescale 1 ns / 1 ps
+
 module rotate #(
     parameter width = 8,
     parameter n = 2

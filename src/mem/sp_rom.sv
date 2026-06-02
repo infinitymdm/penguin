@@ -1,3 +1,5 @@
+`timescale 1 ns / 1 ps
+
 module sp_rom #(
     parameter binfile,
     parameter width = 64,

@@ -1,3 +1,5 @@
+`timescale 1 ns / 1 ps
+
 module seven_seg_bcd_decoder (
   input logic [3:0] data,
   input logic dp,

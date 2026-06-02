@@ -1,3 +1,5 @@
+`timescale 1 ns / 1 ps
+
 module dec10_counter (
   input logic clk, dec, reset,
   output logic [3:0] data,
@@ -5,8 +7,8 @@ module dec10_counter (
 );
 
   // A Moore FSM which increments once each time
-  // clk is asserted. dec can be asserted to decrease by 1 
-  // synchronously, or reset can be asserted to set to 0 
+  // clk is asserted. dec can be asserted to decrease by 1
+  // synchronously, or reset can be asserted to set to 0
   // asynchronously.
   // Also provides a carry output for cascading with other counters.
 

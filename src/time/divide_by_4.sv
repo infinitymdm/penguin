@@ -1,3 +1,5 @@
+`timescale 1 ns / 1 ps
+
 module divide_by_4 (input logic clk,
                      output logic out_clk);
     localparam N = 4;

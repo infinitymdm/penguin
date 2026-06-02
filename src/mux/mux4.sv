@@ -1,3 +1,5 @@
+`timescale 1 ns / 1 ps
+
 module mux4 #(
   parameter N = 8
 ) (

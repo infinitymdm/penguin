@@ -1,3 +1,5 @@
+`timescale 1 ns / 1 ps
+
 `define TO_STRING(x) `"x`"
 
 // The following vars must be defined, usually in a simulator +define+ flag
@@ -23,7 +25,7 @@ module tb_sha3_pipelined;
     int cycle_counter;
 
     bit clk, reset, enable;
-    bit   [1:0] op;
+    bit         op;
     bit   [4:0] round;
     bit [r-1:0] message;
     bit [d-1:0] digest, expected_digest;
@@ -44,7 +46,7 @@ module tb_sha3_pipelined;
         enable = 1'b0;
         reset = 1'b1;
         message = '0;
-        cycle_counter = 2;
+        cycle_counter = 1;
         round = 23;
         #10;
         enable = 1'b1;
@@ -52,7 +54,7 @@ module tb_sha3_pipelined;
         reset = 1'b0;
     end
     always #5 clk <= ~clk;
-    assign op = cycle_counter % 3;
+    assign op = cycle_counter % 2;
 
     initial begin: open_message_file
         message_file = $fopen(message_file_name, "rb");
@@ -102,9 +104,9 @@ module tb_sha3_pipelined;
 
     always @(negedge clk) begin: stimulate_dut
         if (!$feof(message_file)) begin: get_message
-            if ((round == 23) && (op == 2)) read_message_chunk(message_file, message);
+            if ((round == 23) && op) read_message_chunk(message_file, message);
         end else begin: handle_eof
-            #720;
+            #480;
             `ifdef MODEL_TECH
                 #10; // If using modelsim, we need 1 more cycle of delay for some reason
             `endif

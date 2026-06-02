@@ -1,3 +1,5 @@
+`timescale 1 ns / 1 ps
+
 module seven_seg_driver (
   input  logic       clk,
   input  logic [3:0] a, b, c, d,

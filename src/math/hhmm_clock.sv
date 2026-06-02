@@ -1,3 +1,5 @@
+`timescale 1 ns / 1 ps
+
 module hhmm_clock (
   input logic clk, dec, reset,
   output logic [3:0] min_ones, min_tens, hour_ones, hour_tens,
