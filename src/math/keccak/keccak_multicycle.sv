@@ -1,3 +1,5 @@
+`timescale 1 ns / 1 ps
+
 module keccak_multicycle #(
     parameter d = 512,      // digest length in bits
     parameter l = 6,        // log base 2 of the lane size. Use l=6 for all SHA3/SHAKE ops.

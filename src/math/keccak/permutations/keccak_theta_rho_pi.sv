@@ -1,3 +1,5 @@
+`timescale 1 ns / 1 ps
+
 module keccak_theta_rho_pi #(
     parameter w = 64
 ) (

@@ -1,3 +1,5 @@
+`timescale 1 ns / 1 ps
+
 module keccak_p #(
     parameter l = 6,
     parameter n = 4,

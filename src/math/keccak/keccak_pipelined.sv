@@ -1,3 +1,5 @@
+`timescale 1 ns / 1 ps
+
 module keccak_pipelined #(
     parameter D = 512,      // digest length in bits
     parameter L = 6,        // log base 2 of lane size. L=6 for all SHA3/SHAKE ops.

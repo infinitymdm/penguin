@@ -1,3 +1,5 @@
+`timescale 1 ns / 1 ps
+
 module vector2block #(
     parameter W = 64,
     parameter B = 25*W
