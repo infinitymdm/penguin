@@ -1,25 +1,11 @@
 `timescale 1 ns / 1 ps
 
-`define TO_STRING(x) `"x`"
-
-// The following vars must be defined, usually in a simulator +define+ flag
-`ifndef DIGEST_LENGTH
-    `error_define_DIGEST_LENGTH_must_be_set
-`endif
-`ifndef STAGES
-    `error_define_STAGES_must_be_set
-`endif
-`ifndef MESSAGE_FILE
-    `error_define_MESSAGE_FILE_must_be_set
-`endif
-
-module tb_sha3_pipelined;
-
-    localparam d = `DIGEST_LENGTH;  // 512, 384, 256, 224 all work
-    string message_file_name = {"../", `TO_STRING(`MESSAGE_FILE)};
-
-    // Derived
-    localparam r = 1600 - 2*d;
+module tb_sha3_pipelined #(
+    parameter    int D = 512, // 512, 384, 256, 224 all work
+    parameter    int R = 1600 - 2*D,
+    parameter string M = "../README.md",
+    parameter string EXPECTED_DIGEST = "cc06f7362fa672954deea15583e881c9282863c6d0d726e1a27c69ac2ff8da612643c17e1e1fa0d018c9acd047c7547170975b33f8c9a3c22dcfccb3d5528ef8"
+);
 
     int message_file;
     int cycle_counter;
@@ -27,18 +13,23 @@ module tb_sha3_pipelined;
     bit clk, reset, enable;
     bit         op;
     bit   [4:0] round;
-    bit [r-1:0] message;
-    bit [d-1:0] digest, expected_digest;
+    bit [R-1:0] message;
+    bit [D-1:0] digest, expected_digest;
 
-    keccak_pipelined #(d) dut (
+    keccak_pipelined #(D) dut (
         .clk, .reset, .enable,
         .op, .round,
         .message, .digest
     );
+    assign op = cycle_counter % 2;
 
     initial begin: dump_vcd
-        $dumpfile("wave.vcd");
-        $dumpvars;
+        `ifdef SILICONCOMPILER_TRACE_FILE
+            $dumpfile(`SILICONCOMPILER_TRACE_FILE);
+        `else
+            $dumpfile("wave.vcd");
+        `endif
+        $dumpvars(0, tb_sha3_pipelined);
     end
 
     initial begin: init_and_reset
@@ -54,18 +45,17 @@ module tb_sha3_pipelined;
         reset = 1'b0;
     end
     always #5 clk <= ~clk;
-    assign op = cycle_counter % 2;
 
     initial begin: open_message_file
-        message_file = $fopen(message_file_name, "rb");
-        if (message_file == 0) $error("Unable to open file '%s'", message_file_name);
+        message_file = $fopen(M, "rb");
+        if (message_file == 0) $error("Unable to open file '%s'", M);
     end
 
-    task automatic read_message_chunk (input int m_file, output bit [r-1:0] m);
+    task automatic read_message_chunk (input int m_file, output bit [R-1:0] m);
         int pad_count = 0;
         byte c;
         byte message_byte;
-        for (int i = 0; i < r/8; i++) begin: get_message_byte
+        for (int i = 0; i < R/8; i++) begin: get_message_byte
             c = $fgetc(m_file);
             if (!$feof(m_file)) begin: read_byte
                 // Read as long as there are bytes
@@ -73,27 +63,14 @@ module tb_sha3_pipelined;
             end else begin: pad_byte
                 // Once out of bytes to read, pad according to SHA3
                 pad_count++;
-                case ({pad_count == 1, i == r/8-1})
+                case ({pad_count == 1, i == R/8-1})
                     2'b00: message_byte = 8'h00;
                     2'b01: message_byte = 8'h80;
                     2'b10: message_byte = 8'h06;
                     2'b11: message_byte = 8'h86;
                 endcase
             end
-            m = {m[r-9:0], message_byte};
-        end
-    endtask
-
-    task automatic get_expected_digest (input string m_filename, output bit [d-1:0] expected_digest);
-        // Call openssl to get the expected result
-        int expected_file;
-        void'($system({"openssl dgst -sha3-", `TO_STRING(`DIGEST_LENGTH), " ", m_filename, " | awk '{print $2}' > .expected"}));
-        expected_file = $fopen(".expected", "r");
-        if (expected_file != 0) begin
-            void'($fscanf(expected_file, "%h", expected_digest));
-            $fclose(expected_file);
-        end else begin
-            $error("Unable to open file '.expected'");
+            m = {m[R-9:0], message_byte};
         end
     endtask
 
@@ -112,10 +89,10 @@ module tb_sha3_pipelined;
             `endif
             enable = 1'b0;
             #1;
-            $display("digest:  %h", digest);
+            $display("digest:   %h", digest);
             $fclose(message_file);
-            get_expected_digest(message_file_name, expected_digest);
-            $display("openssl: %h", expected_digest);
+            $sscanf(EXPECTED_DIGEST, "%h", expected_digest);
+            $display("expected: %h", expected_digest);
             if (digest == expected_digest) begin
                 $write("%c[1;32m", 27); // Set style bold, green foreground
                 $display("PASS");
