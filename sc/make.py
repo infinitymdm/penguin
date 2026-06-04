@@ -37,7 +37,7 @@ class PenguinSHA3Design(Design):
         self.set_name('penguin_sha3')
         self.set_dataroot('penguin',
                           'git+https://github.com/infinitymdm/penguin.git',
-                          '1002ee655a49f809df806c865a18be604b6ad327')
+                          '721760604bc6ab8743b2a5ff977a0337b8d201c2')
         self.set_dataroot('local', __file__)
 
         with self.active_fileset('rtl'):
@@ -79,6 +79,9 @@ def sim(tool: str = 'verilator', **rtl_params):
         design.set_param(param, str(value), fileset='testbench')
 
     project.set_flow(DVFlow(tool=tool))
+
+    # Set verilator to use --main since we have a pure sv testbench
+    project.set('tool', 'verilator', 'task', 'compile', 'var', 'main', True)
 
     project.run()
     project.summary()
@@ -123,4 +126,4 @@ if __name__ == "__main__":
     check()
     # lint()
     # syn()
-    sim(M=Path('../README').absolute())
+    sim(D=512, M=Path('../README').resolve().absolute())
