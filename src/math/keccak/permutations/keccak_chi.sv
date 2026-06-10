@@ -1,10 +1,10 @@
 `timescale 1 ns / 1 ps
 
 module keccak_chi #(
-    parameter w = 64
+    parameter W = 64
 ) (
-    input  logic [4:0][4:0][w-1:0] x,
-    output logic [4:0][4:0][w-1:0] y
+    input  logic [4:0][4:0][W-1:0] x,
+    output logic [4:0][4:0][W-1:0] y
 );
 
     generate

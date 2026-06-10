@@ -1,12 +1,18 @@
 `timescale 1 ns / 1 ps
 
-module keccak_pipelined #(
+// keccak_staged implements a Q-cycle staged keccak sponge function.
+// This module completes the keccak sponge operation in Q cycles, where Q may be any of the
+// following: 48 (2-cycle split round), 24 (1 round/cycle), 12 (2 rounds/cycle), 8, 6, 4, 3, 2, 1.
+// TODO: Implement staging based on Q parameter
+
+module keccak_staged #(
     parameter D = 512,      // digest length in bits
     parameter L = 6,        // log base 2 of lane size. L=6 for all SHA3/SHAKE ops.
     parameter W = 2**L,     // lane size (i.e. word length) in bits
     parameter B = 25*W,     // keccak permuation width in bits
     parameter C = 2*D,      // capacity of the sponge function in bits
-    parameter R = B - C     // rate of the sponge function in bits
+    parameter R = B - C,    // rate of the sponge function in bits
+    parameter Q = 48        // reserved for future use. number of cycles to complete a sponge operation
 ) (
     input  logic         clk, reset, enable,
     input  logic         op,

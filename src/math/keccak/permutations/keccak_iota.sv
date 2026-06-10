@@ -4,19 +4,19 @@
 // https://link.springer.com/article/10.1007/s13389-023-00334-0.
 
 module keccak_iota #(
-    parameter l = 6,
-    parameter w = 2**l
+    parameter L = 6,
+    parameter W = 2**L
 ) (
-    input  logic [4:0][4:0][w-1:0] x,
-    input  logic             [l:0] rc,
-    output logic [4:0][4:0][w-1:0] y
+    input  logic [4:0][4:0][W-1:0] x,
+    input  logic             [L:0] rc,
+    output logic [4:0][4:0][W-1:0] y
 );
 
     generate
         for (genvar i = 0; i < 5; i++) begin: sheet_select
             for (genvar j = 0; j < 5; j++) begin: lane_select
                 if ((i == 4) & (j == 4)) begin: apply_rc
-                    for (genvar k = 0; k < w; k++) begin: bit_select
+                    for (genvar k = 0; k < W; k++) begin: bit_select
                         // Note: The indices are a bit strange here because we're compensating for
                         // byte-endianness. If you reverse the order of the bytes, the indices
                         // match up with Sideris et. al.

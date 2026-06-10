@@ -2,8 +2,8 @@
 
 module keccak_round #(
     parameter L = 6,
-    parameter W = 2**l,
-    parameter B = 25*w
+    parameter W = 2**L,
+    parameter B = 25*W
 ) (
     input  logic [B-1:0] x,
     input  logic   [L:0] rc,
@@ -17,7 +17,7 @@ module keccak_round #(
     logic [4:0][4:0][W-1:0] x_block, x_pi, x_chi, y_block;
 
     // Reorganize i/o into 3-dimensional blocks for easy indexing in subfunctions
-    vector2block #(.W, .B v2b (.vector(x), .block(x_block));
+    vector2block #(.W, .B) v2b (.vector(x), .block(x_block));
     block2vector #(.W, .B) b2v (.block(y_block), .vector(y));
 
     // Perform a single round of the keccak-p permutation
