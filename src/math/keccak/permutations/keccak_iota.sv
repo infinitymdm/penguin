@@ -1,5 +1,8 @@
 `timescale 1 ns / 1 ps
 
+// Optimized keccak iota stage. Uses minimized 7-bit round constants as in
+// https://link.springer.com/article/10.1007/s13389-023-00334-0.
+
 module keccak_iota #(
     parameter l = 6,
     parameter w = 2**l
