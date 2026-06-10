@@ -9,14 +9,11 @@ module keccak_pipelined #(
     parameter R = B - C     // rate of the sponge function in bits
 ) (
     input  logic         clk, reset, enable,
+    input  logic         op,
     input  logic   [4:0] round,
     input  logic [R-1:0] message,
     output logic [D-1:0] digest
 );
-    // TODO: investigate variable capacity/rate (i.e. to allow <512 bit digests on SHA3-512 hardware)
-    //  - Assume the parameters D, C, and R are max widths
-    //  - adding an "input logic [...] capacity " should allow us to dynamically switch both capacity and rate
-
     logic [23:0][6:0] iota_consts = {
         7'b0010111,
         7'b1000010,
@@ -44,27 +41,22 @@ module keccak_pipelined #(
         7'b1000000
     };
     logic [B-1:0] x, y, q;
-    logic [4:0][4:0][W-1:0] x_block, y_pi, y_chi, y_iota, q_block;
+    logic [4:0][4:0][W-1:0] x_block, y_pi, y_chi, y_iota, y_block;
 
     assign x = {q[B-1:C] ^ message, q[C-1:0]};
-    vector2block #(W) v2b (.vector((round == 0) ? x : q), .block(x_block));
+    vector2block #(W) v2b (.vector((round == 0) && (op == 0) ? x : q), .block(x_block));
 
-    // stage 1: fused & optimized theta/rho/pi
+    // op 0: fused & optimized theta/rho/pi
     keccak_theta_rho_pi #(W) theta_rho_pi (.x(x_block), .y(y_pi));
-    generate
-        for (genvar i = 0; i < 5; i++) begin: sheet_select
-            for (genvar j = 0; j < 5; j++) begin: lane_select
-                dffre #(.width(W)) lane_reg (.clk, .reset, .enable, .d(y_pi[i][j]), .q(q_block[i][j]));
-            end
-        end
-    endgenerate
 
-    // stage 2: fused chi/iota
-    keccak_chi  #(W) chi  (.x(q_block), .y(y_chi));
-    keccak_iota #(L) iota (.x(y_chi), .y(y_iota), .rc(iota_consts[round]));
-    block2vector #(W) b2v (.block(y_iota), .vector(y));
+    // op 1: fused chi/iota
+    keccak_chi          #(W) chi          (.x(x_block), .y(y_chi));
+    keccak_iota         #(L) iota         (.x(y_chi), .y(y_iota), .rc(iota_consts[round]));
+
+    assign y_block = op ? y_iota : y_pi;
+
+    block2vector #(W) b2v (.block(y_block), .vector(y));
     dffre #(.width(B)) iota_reg (.clk, .reset, .enable, .d(y), .q);
-
     assign digest = q[B-1-:D];
 
 endmodule

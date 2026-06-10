@@ -18,7 +18,7 @@ module tb_sha3_pipelined #(
 
     keccak_pipelined #(D) dut (
         .clk, .reset, .enable,
-        .op, .round,
+        .round,
         .message, .digest
     );
     assign op = cycle_counter % 2;
